@@ -1,0 +1,6 @@
+{
+  "scope": "x_276493_onincreq",
+  "scopeId": "f69bfc69470103100da3a464116d43e2",
+  "name": "OnincReq",
+  "tsconfigPath": "./src/server/tsconfig.json"
+}
