@@ -1,11 +1,9 @@
 import {
   Table,
   StringColumn,
-  DateColumn,
   DateTimeColumn,
   ReferenceColumn,
   ChoiceColumn,
-  BooleanColumn,
   IntegerColumn,
   GenericColumn,
 } from "@servicenow/sdk/core";
@@ -15,7 +13,7 @@ export const x_276493_onincreq_on_site_incident_request = Table({
   label: "On-Site Incident Request",
   allow_web_service_access: true,
   auto_number: {
-    prefix: "ONSITEREQ",
+    prefix: "ONSITREQ",
     number: 1,
     number_of_digits: 7,
   },
@@ -26,72 +24,68 @@ export const x_276493_onincreq_on_site_incident_request = Table({
       read_only: true,
       default: "javascript:global.getNextObjNumberPadded();",
     }),
-    short_description: StringColumn({
-      label: "概要",
-      maxLength: 160,
-      mandatory: true,
-    }),
-    requested_on_site_date: DateColumn({
-      label: "予約日",
-      mandatory: true,
-    }),
-    requester: ReferenceColumn({
+    caller_id: ReferenceColumn({
       label: "申請者",
       referenceTable: "sys_user",
       mandatory: true,
     }),
-    location_type: ChoiceColumn({
+    u_request_date: DateTimeColumn({
+      label: "申請日",
+      mandatory: true,
+    }),
+    u_facility_type: ChoiceColumn({
       label: "設備種類",
       mandatory: true,
       dropdown: "dropdown_without_none",
       choices: {
-        hardware: { label: "ハードウェア", sequence: 0 },
-        software: { label: "ソフトウェア", sequence: 1 },
+        meeting_room: { label: "会議室", sequence: 0 },
+        server_room: { label: "サーバー室", sequence: 1 },
+        shared_area: { label: "共有エリア", sequence: 2 },
+        equipment: { label: "共有機器", sequence: 3 },
+        other: { label: "その他", sequence: 4 },
       },
     }),
-    locate_cube: ChoiceColumn({
-      label: "Locate Cube",
-      dropdown: "dropdown_with_none",
-      choices: {
-        center_a: { label: "Center_A", sequence: 0 },
-        center_b: { label: "Center_B", sequence: 1 },
-        center_c: { label: "Center_C", sequence: 2 },
-      },
+    u_facility_id: StringColumn({
+      label: "設備室番号",
+      maxLength: 50,
     }),
-    machine_room: ChoiceColumn({
-      label: "設備室",
-      dropdown: "dropdown_with_none",
-      choices: {
-        room_101: { label: "設備室101", sequence: 0 },
-        room_102: { label: "設備室102", sequence: 1 },
-        room_201: { label: "設備室201", sequence: 2 },
-      },
-    }),
-    server: BooleanColumn({
-      label: "サーバー",
-      default: false,
-    }),
-    projector: BooleanColumn({
-      label: "プロジェクター",
-      default: false,
-    }),
-    special_notes: StringColumn({
-      label: "特記事項",
-      maxLength: 4000,
-    }),
-    state: ChoiceColumn({
-      label: "ステータス",
+    priority: IntegerColumn({
+      label: "優先度",
       mandatory: true,
-      default: "draft",
       dropdown: "dropdown_without_none",
       choices: {
-        draft: { label: "下書き", sequence: 0 },
-        submitted: { label: "提出済み", sequence: 1 },
-        pending_approval: { label: "承認待ち", sequence: 2 },
-        in_progress: { label: "処理中", sequence: 3 },
-        completed: { label: "完了", sequence: 4 },
-        cancelled: { label: "キャンセル", sequence: 5 },
+        "1": { label: "緊急", sequence: 0 },
+        "2": { label: "高", sequence: 1 },
+        "3": { label: "中", sequence: 2 },
+        "4": { label: "低", sequence: 3 },
       },
+    }),
+    state: IntegerColumn({
+      label: "ステータス",
+      mandatory: true,
+      dropdown: "dropdown_without_none",
+      choices: {
+        "1": { label: "新規", sequence: 0 },
+        "2": { label: "対応中", sequence: 1 },
+        "3": { label: "承認待ち", sequence: 2 },
+        "4": { label: "保留", sequence: 3 },
+        "6": { label: "解決済み", sequence: 4 },
+        "7": { label: "クローズ", sequence: 5 },
+      },
+    }),
+    short_description: StringColumn({
+      label: "問い合わせ件名",
+      maxLength: 160,
+      mandatory: true,
+    }),
+    description: GenericColumn({
+      label: "詳細説明",
+      columnType: "journal",
+    }),
+    u_location_detail: StringColumn({
+      label: "発生場所詳細",
+      maxLength: 200,
+      mandatory: true,
     }),
     assigned_to: ReferenceColumn({
       label: "担当者",
@@ -101,24 +95,18 @@ export const x_276493_onincreq_on_site_incident_request = Table({
       label: "担当グループ",
       referenceTable: "sys_user_group",
     }),
-    priority: IntegerColumn({
-      label: "優先度",
-      mandatory: true,
-      default: "2",
-      dropdown: "dropdown_without_none",
+    approval: ChoiceColumn({
+      label: "承認ステータス",
+      dropdown: "dropdown_with_none",
       choices: {
-        "1": { label: "Low", sequence: 0 },
-        "2": { label: "Medium", sequence: 1 },
-        "3": { label: "High", sequence: 2 },
-        "4": { label: "Critical", sequence: 3 },
+        not_requested: { label: "未申請", sequence: 0 },
+        requested: { label: "申請中", sequence: 1 },
+        approved: { label: "承認済み", sequence: 2 },
+        rejected: { label: "却下", sequence: 3 },
       },
     }),
-    work_notes: GenericColumn({
-      label: "作業メモ",
-      columnType: "journal",
-    }),
-    closed_at: DateTimeColumn({
-      label: "完了日時",
+    resolved_at: DateTimeColumn({
+      label: "解決日時",
     }),
   },
 });
